@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import Script from 'next/script';
 import './globals.css';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -101,7 +102,7 @@ function Footer() {
           </div>
         </div>
 
-        {/* Copyright notice - static string avoids prerender evaluation error */}
+        {/* Copyright notice */}
         <p className="footer-copy" style={{ marginTop: '1.5rem' }}>
           &copy; 2026 Norfolk Deli. All Rights Reserved.
         </p>
@@ -138,9 +139,17 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* Yoco Web SDK */}
+        <Script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" strategy="lazyOnload" />
+
         <CartProvider>
-          <Navbar onOpenCart={() => setIsCartOpen(true)} />
+          {/* Suspense boundary handles usePathname client hook during Vercel prerendering */}
+          <Suspense fallback={<nav className="navbar"></nav>}>
+            <Navbar onOpenCart={() => setIsCartOpen(true)} />
+          </Suspense>
+
           {children}
+          
           <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           <Footer />
           <BackToTop />
