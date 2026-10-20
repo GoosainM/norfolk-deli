@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, } from 'react';
-import Script from 'next/script';
+import React, { useState } from 'react';
 import './globals.css';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -102,7 +101,7 @@ function Footer() {
           </div>
         </div>
 
-        {/* Copyright notice */}
+        {/* Copyright notice - static string avoids prerender evaluation error */}
         <p className="footer-copy" style={{ marginTop: '1.5rem' }}>
           &copy; 2026 Norfolk Deli. All Rights Reserved.
         </p>
@@ -139,9 +138,6 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* Yoco Web SDK */}
-        <Script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" strategy="lazyOnload" />
-
         <CartProvider>
           <Navbar onOpenCart={() => setIsCartOpen(true)} />
           {children}
