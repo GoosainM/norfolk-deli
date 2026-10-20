@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '../context/CartContext';
@@ -7,29 +8,48 @@ import { useCart } from '../context/CartContext';
 export default function Navbar({ onOpenCart }) {
   const pathname = usePathname();
   const { cart } = useCart();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="site-header">
       <div className="header-container">
-        <button id="mobile-menu-toggle" className="mobile-toggle-btn" aria-label="Toggle navigation menu">
-          <i className="fa-solid fa-bars"></i>
+        {/* Toggle Button */}
+        <button 
+          id="mobile-menu-toggle" 
+          className="mobile-toggle-btn" 
+          onClick={toggleMenu}
+          aria-label="Toggle navigation menu"
+        >
+          <i className={isMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"}></i>
         </button>
 
-        <nav id="site-nav" className="nav-wrapper">
+        {/* Mobile-enabled Navigation Menu */}
+        <nav id="site-nav" className={`nav-wrapper ${isMenuOpen ? 'active' : ''}`}>
           <ul className="nav-links">
             <li>
-              <Link href="/" className={pathname === '/' ? 'active' : ''}>Home</Link>
+              <Link href="/" className={pathname === '/' ? 'active' : ''} onClick={closeMenu}>
+                Home
+              </Link>
             </li>
             <li>
-              <Link href="/bakery" className={pathname === '/bakery' ? 'active' : ''}>Bakery</Link>
+              <Link href="/bakery" className={pathname === '/bakery' ? 'active' : ''} onClick={closeMenu}>
+                Bakery
+              </Link>
             </li>
             <li>
-              <Link href="/menu" className={pathname === '/menu' ? 'active' : ''}>Menu</Link>
+              <Link href="/menu" className={pathname === '/menu' ? 'active' : ''} onClick={closeMenu}>
+                Menu
+              </Link>
             </li>
             <li>
-              <Link href="/events" className={pathname === '/events' ? 'active' : ''}>Events</Link>
+              <Link href="/events" className={pathname === '/events' ? 'active' : ''} onClick={closeMenu}>
+                Events
+              </Link>
             </li>
           </ul>
         </nav>
