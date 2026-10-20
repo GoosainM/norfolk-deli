@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, } from 'react';
 import Script from 'next/script';
 import './globals.css';
 import { CartProvider } from './context/CartContext';

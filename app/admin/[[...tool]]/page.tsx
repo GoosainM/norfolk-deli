@@ -25,3 +25,5 @@ const config = defineConfig({
 export default function AdminPage() {
   return <NextStudio config={config} />;
 }
+
+export const dynamic = 'force-dynamic';
