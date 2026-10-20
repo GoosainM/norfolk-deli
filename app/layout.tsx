@@ -44,7 +44,7 @@ function Footer() {
           />
         </div>
 
-        {/* Contact Info: Email, WhatsApp, and Social Icon */}
+        {/* Contact Info */}
         <div 
           style={{
             display: 'flex',
@@ -54,7 +54,6 @@ function Footer() {
             marginTop: '0.5rem'
           }}
         >
-          {/* Email */}
           <a
             href="mailto:info@norfolkdeli.co.za"
             style={{
@@ -70,7 +69,6 @@ function Footer() {
             <i className="fa-regular fa-envelope"></i> info@norfolkdeli.co.za
           </a>
 
-          {/* WhatsApp */}
           <a
             href="https://wa.me/27710434342"
             target="_blank"
@@ -88,7 +86,6 @@ function Footer() {
             <i className="fa-brands fa-whatsapp"></i> +27 71 043 4342
           </a>
 
-          {/* Instagram Icon */}
           <div className="footer-social" style={{ marginTop: '0.4rem' }}>
             <a
               href="https://www.instagram.com/norfolk.deli"
@@ -102,7 +99,6 @@ function Footer() {
           </div>
         </div>
 
-        {/* Copyright notice */}
         <p className="footer-copy" style={{ marginTop: '1.5rem' }}>
           &copy; 2026 Norfolk Deli. All Rights Reserved.
         </p>
@@ -122,13 +118,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <title>Norfolk Deli | Sea Point Pre-Orders & Events</title>
         <meta 
           name="description" 
           content="Pre-order freshly baked cakes, savoury frittatas, and view monthly community events at Norfolk Deli in Sea Point." 
         />
-        {/* Brand Fonts & CDN Dependencies */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.cdnfonts.com/css/glacial-indifference" rel="stylesheet" />
@@ -139,11 +134,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* Yoco Web SDK */}
         <Script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" strategy="lazyOnload" />
 
         <CartProvider>
-          {/* Suspense boundary handles usePathname client hook during Vercel prerendering */}
           <Suspense fallback={<nav className="navbar"></nav>}>
             <Navbar onOpenCart={() => setIsCartOpen(true)} />
           </Suspense>
