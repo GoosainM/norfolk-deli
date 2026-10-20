@@ -1540,7 +1540,11 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 768px) {
   .site-header {
     position: relative;
-    background-color: var(--accent-olive, #535622);
+    z-index: 10000;
+  }
+
+  .header-container {
+    position: relative;
   }
 
   .nav-wrapper {
@@ -1548,37 +1552,46 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     top: 100%;
     left: 0;
-    width: 100%;
-    background-color: #535622; /* Dark olive background matching the navbar */
-    padding: 1.5rem 0;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    right: 0;
+    width: 100vw;
+    background-color: #535622 !important; /* Solid olive background */
+    padding: 2rem 1rem;
+    z-index: 99999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   }
 
   .nav-wrapper.active {
-    display: block;
+    display: block !important;
   }
 
   .nav-links {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.5rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  .nav-links li {
+    width: 100%;
+    text-align: center;
   }
 
   .nav-links a {
-    color: #ffffff !important; /* Bright white links so they are clearly visible */
-    font-size: 1.2rem;
-    font-weight: 600;
+    display: block;
+    color: #ffffff !important;
+    font-size: 1.25rem;
+    font-weight: 700;
     text-decoration: none;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
+    padding: 0.5rem 0;
   }
 
   .nav-links a.active {
-    color: #e2d8b2 !important; /* Accent color for the active page */
+    color: #e2d8b2 !important;
   }
 }
