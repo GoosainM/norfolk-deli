@@ -100,8 +100,8 @@ function Footer() {
         </div>
 
         <p className="footer-copy" style={{ marginTop: '1.5rem' }}>
-          &copy; 2026 Norfolk Deli. All Rights Reserved.
-        </p>
+  &copy; 2026 Designed by Matthews Developments | All Rights Reserved
+</p>
       </div>
     </footer>
   );
