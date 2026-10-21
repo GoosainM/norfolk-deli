@@ -134,7 +134,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" strategy="lazyOnload" />
+        <Script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" strategy="afterInteractive" />
 
         <CartProvider>
           <Suspense fallback={<nav className="navbar"></nav>}>

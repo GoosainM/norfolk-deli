@@ -115,6 +115,27 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  // Dynamic loader helper to guarantee YocoSDK is attached
+  const loadYocoScript = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window !== 'undefined' && window.YocoSDK) {
+        return resolve(window.YocoSDK);
+      }
+      const existingScript = document.getElementById('yoco-sdk-script');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(window.YocoSDK));
+        existingScript.addEventListener('error', () => reject(new Error('Failed to load Yoco SDK')));
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'yoco-sdk-script';
+      script.src = 'https://js.yoco.com/sdk/v1/yoco-sdk-web.js';
+      script.onload = () => resolve(window.YocoSDK);
+      script.onerror = () => reject(new Error('Failed to load Yoco SDK script'));
+      document.body.appendChild(script);
+    });
+  };
+
   // Yoco Popup Checkout Handler
   const handleCheckout = async (e) => {
     e.preventDefault();
@@ -129,60 +150,61 @@ export default function CartDrawer({ isOpen, onClose }) {
       return;
     }
 
-    if (typeof window.YocoSDK === 'undefined') {
-      alert('Yoco payment SDK failed to load. Please refresh the page and try again.');
-      return;
-    }
-
     setLoading(true);
 
-    // Initialize Yoco Inline Popup
-    const sdk = new window.YocoSDK({
-      publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
-    });
+    try {
+      const YocoSDKClass = await loadYocoScript();
 
-    sdk.inline({
-      layout: 'field',
-      amountInCents: Math.round(total * 100), // Convert Rands to Cents
-      currency: 'ZAR',
-      name: 'Norfolk Deli',
-      description: 'Bakery & Deli Pre-Order',
-      callback: async (result) => {
-        if (result.error) {
-          alert(`Payment failed: ${result.error.message}`);
-          setLoading(false);
-        } else {
-          // Send charge token & order info to backend API
-          try {
-            const res = await fetch('/api/yoco', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                token: result.id,
-                amountInCents: Math.round(total * 100),
-                cart,
-                customer,
-              }),
-            });
+      const yoco = new YocoSDKClass({
+        publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
+      });
 
-            const data = await res.json();
-
-            if (data.success) {
-              alert('Payment Successful! Your pre-order has been placed.');
-              if (clearCart) clearCart();
-              onClose();
-            } else {
-              alert(`Payment verification failed: ${data.error || 'Please contact support.'}`);
-            }
-          } catch (err) {
-            console.error('Yoco Checkout Error:', err);
-            alert('An error occurred processing your payment. Please try again.');
-          } finally {
+      yoco.showPopup({
+        amountInCents: Math.round(total * 100), // Convert Rands to Cents
+        currency: 'ZAR',
+        name: 'Norfolk Deli',
+        description: 'Bakery & Deli Pre-Order',
+        callback: async (result) => {
+          if (result.error) {
+            alert(`Payment failed: ${result.error.message}`);
             setLoading(false);
+          } else {
+            // Send charge token & order info to backend API
+            try {
+              const res = await fetch('/api/yoco', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  token: result.id,
+                  amountInCents: Math.round(total * 100),
+                  cart,
+                  customer,
+                }),
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                alert('Payment Successful! Your pre-order has been placed.');
+                if (clearCart) clearCart();
+                onClose();
+              } else {
+                alert(`Payment verification failed: ${data.error || 'Please contact support.'}`);
+              }
+            } catch (err) {
+              console.error('Yoco Checkout Error:', err);
+              alert('An error occurred processing your payment. Please try again.');
+            } finally {
+              setLoading(false);
+            }
           }
-        }
-      },
-    });
+        },
+      });
+    } catch (err) {
+      console.error('Failed to load Yoco SDK:', err);
+      alert('Yoco payment SDK failed to load. Please refresh the page and try again.');
+      setLoading(false);
+    }
   };
 
   return (
