@@ -115,23 +115,33 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Dynamic loader helper to guarantee YocoSDK is attached
+  // Client-safe dynamic loader for Yoco SDK
   const loadYocoScript = () => {
     return new Promise((resolve, reject) => {
       if (typeof window !== 'undefined' && window.YocoSDK) {
         return resolve(window.YocoSDK);
       }
+
       const existingScript = document.getElementById('yoco-sdk-script');
       if (existingScript) {
+        if (window.YocoSDK) return resolve(window.YocoSDK);
         existingScript.addEventListener('load', () => resolve(window.YocoSDK));
-        existingScript.addEventListener('error', () => reject(new Error('Failed to load Yoco SDK')));
+        existingScript.addEventListener('error', () => reject(new Error('Yoco SDK failed to load')));
         return;
       }
+
       const script = document.createElement('script');
       script.id = 'yoco-sdk-script';
       script.src = 'https://js.yoco.com/sdk/v1/yoco-sdk-web.js';
-      script.onload = () => resolve(window.YocoSDK);
-      script.onerror = () => reject(new Error('Failed to load Yoco SDK script'));
+      script.async = true;
+      script.onload = () => {
+        if (window.YocoSDK) {
+          resolve(window.YocoSDK);
+        } else {
+          reject(new Error('YocoSDK object not found on window'));
+        }
+      };
+      script.onerror = (err) => reject(err);
       document.body.appendChild(script);
     });
   };
