@@ -165,11 +165,11 @@ export default function CartDrawer({ isOpen, onClose }) {
     try {
       const YocoSDKClass = await loadYocoScript();
 
-      const yoco = new YocoSDKClass({
+      const sdk = new YocoSDKClass({
         publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
       });
 
-      yoco.showPopup({
+      sdk.showPopup({
         amountInCents: Math.round(total * 100), // Convert Rands to Cents
         currency: 'ZAR',
         name: 'Norfolk Deli',
@@ -216,7 +216,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       setLoading(false);
     }
   };
-
+  
   return (
     <>
       <div 
