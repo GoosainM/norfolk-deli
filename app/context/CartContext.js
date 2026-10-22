@@ -9,7 +9,13 @@ export function CartProvider({ children }) {
   // Load saved basket from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('norfolk_cart');
-    if (savedCart) setCart(JSON.parse(savedCart));
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error('Failed to parse saved cart:', e);
+      }
+    }
   }, []);
 
   // Persist to localStorage whenever cart updates
@@ -37,8 +43,14 @@ export function CartProvider({ children }) {
     );
   };
 
+  // Added clearCart helper to reset basket upon successful payment
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('norfolk_cart');
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateQuantity }}>
+    <CartContext.Provider value={{ cart, addToCart, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );
