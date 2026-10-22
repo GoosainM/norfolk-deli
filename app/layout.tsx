@@ -1,36 +1,33 @@
-'use client';
-
-import React, { useState, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import Script from 'next/script';
 import './globals.css';
-import { CartProvider } from './context/CartContext';
-import Navbar from './components/Navbar';
-import BackToTop from './components/BackToTop';
-import CartDrawer from './components/CartDrawer';
+import ClientProviders from './components/ClientProviders';
+
+export const metadata = {
+  title: 'Norfolk Deli | Sea Point Pre-Orders & Events',
+  description: 'Pre-order freshly baked cakes, savoury frittatas, and view monthly community events at Norfolk Deli in Sea Point.',
+};
 
 function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-container">
-        {/* Section Heading */}
         <h2 
           style={{
             fontSize: '2rem',
             color: 'var(--accent-olive, #535622)',
             margin: '0 0 0.5rem 0',
-            textTransform: 'uppercase',
+            textTransform: 'UPPERCASE',
             letterSpacing: '1.5px'
           }}
         >
           Visit Us
         </h2>
 
-        {/* Address */}
         <p className="footer-location">
           6 Norfolk Road, Sea Point, Cape Town 8005
         </p>
 
-        {/* Google Map Embed */}
         <div className="footer-map-container">
           <iframe
             title="Norfolk Deli Location"
@@ -44,7 +41,6 @@ function Footer() {
           />
         </div>
 
-        {/* Contact Info */}
         <div 
           style={{
             display: 'flex',
@@ -100,8 +96,8 @@ function Footer() {
         </div>
 
         <p className="footer-copy" style={{ marginTop: '1.5rem' }}>
-  &copy; 2026 Designed by Matthews Developments | All Rights Reserved
-</p>
+          &copy; 2026 Designed by Matthews Developments | All Rights Reserved
+        </p>
       </div>
     </footer>
   );
@@ -112,18 +108,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <title>Norfolk Deli | Sea Point Pre-Orders & Events</title>
-        <meta 
-          name="description" 
-          content="Pre-order freshly baked cakes, savoury frittatas, and view monthly community events at Norfolk Deli in Sea Point." 
-        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.cdnfonts.com/css/glacial-indifference" rel="stylesheet" />
@@ -134,17 +121,15 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <CartProvider>
-          <Suspense fallback={<nav className="navbar"></nav>}>
-            <Navbar onOpenCart={() => setIsCartOpen(true)} />
-          </Suspense>
-
+        {/* Yoco Inline SDK Script loaded synchronously before interaction */}
+        <Script 
+          src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" 
+          strategy="beforeInteractive" 
+        />
+        
+        <ClientProviders footer={<Footer />}>
           {children}
-          
-          <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-          <Footer />
-          <BackToTop />
-        </CartProvider>
+        </ClientProviders>
       </body>
     </html>
   );
