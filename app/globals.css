@@ -392,7 +392,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   Cart Drawer - Expanded & Scroll-Free
+   Cart Drawer - Mobile Safe & Overlay Fixed
    ========================================================================== */
 .cart-overlay {
   position: fixed;
@@ -401,7 +401,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  z-index: 99998; /* High z-index to sit above site header */
   opacity: 0;
   visibility: hidden;
   transition: var(--transition);
@@ -419,38 +419,53 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   max-width: 560px;
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
   background: #ffffff;
   box-shadow: -10px 0 30px rgba(0,0,0,0.15);
-  z-index: 1000;
+  z-index: 99999; /* Highest z-index */
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
 }
 
 .cart-drawer.open {
   right: 0;
 }
 
-.cart-drawer-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 1.5rem 1.75rem;
-  overflow-y: auto;
-}
-
+/* Sticky Cart Header with Mobile Notch Inset Support */
 .cart-header {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.85rem;
+  padding: 1.25rem 1.75rem 0.85rem;
+  padding-top: calc(1.25rem + env(safe-area-inset-top, 0px)); /* Safe spacing for mobile notches */
   border-bottom: 1px solid var(--border-light, #e8e4d5);
   flex-shrink: 0;
+  z-index: 10;
 }
 
 .cart-close {
   background: none;
   border: none;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  line-height: 1;
   cursor: pointer;
+  color: #3b3a2a;
+  padding: 0.25rem 0.5rem;
+  margin: -0.25rem -0.5rem;
+  touch-action: manipulation;
+}
+
+.cart-drawer-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 1.75rem 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 }
 
 .cart-body {
@@ -541,6 +556,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .cart-footer {
   padding-top: 1rem;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   border-top: 1px solid var(--border-light);
 }
 
