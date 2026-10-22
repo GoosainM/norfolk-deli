@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCart } from '../context/CartContext';
 
 export default function CartDrawer({ isOpen, onClose }) {
-  const { cart, updateQuantity, clearCart } = useCart();
+  const { cart, updateQuantity } = useCart();
   const [customer, setCustomer] = useState({
     name: '',
     email: '',
@@ -12,45 +12,15 @@ export default function CartDrawer({ isOpen, onClose }) {
     collectionSlot: '',
   });
   const [loading, setLoading] = useState(false);
-  const [sdkReady, setSdkReady] = useState(false);
 
   const [minDate, setMinDate] = useState(null);
   const [maxDate, setMaxDate] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // Dynamically load Yoco SDK v1 cleanly on client mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    if (window.YocoSDK) {
-      setSdkReady(true);
-      return;
-    }
-
-    const scriptId = 'yoco-sdk-v1';
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.src = 'https://js.yoco.com/sdk/v1/yoco-sdk-web.js';
-      script.async = true;
-
-      script.onload = () => {
-        console.log('Yoco SDK v1 loaded successfully');
-        setSdkReady(true);
-      };
-
-      script.onerror = (e) => {
-        console.error('Yoco SDK script failed to load:', e);
-      };
-
-      document.head.appendChild(script);
-    }
-  }, []);
-
   useEffect(() => {
     const today = new Date();
-    
+
     const min = new Date();
     min.setDate(today.getDate() + 2);
 
@@ -104,7 +74,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const daysInCurrentMonth = lastDayOfMonth.getDate();
 
-    const dayOfWeekOfFirst = firstDayOfMonth.getDay(); 
+    const dayOfWeekOfFirst = firstDayOfMonth.getDay();
     const prevMonthDaysToShow = dayOfWeekOfFirst;
 
     const grid = [];
@@ -145,7 +115,7 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Yoco Popup Checkout Handler
+  // Yoco Checkout API: create a checkout on our server, then redirect to Yoco's hosted page
   const handleCheckout = async (e) => {
     e.preventDefault();
 
@@ -159,70 +129,43 @@ export default function CartDrawer({ isOpen, onClose }) {
       return;
     }
 
-    // Correct check for window.YocoSDK
-    if (typeof window === 'undefined' || !window.YocoSDK) {
-      alert('Yoco payment SDK failed to load. Please refresh and try again.');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      // Correct constructor instantiation
-      const yoco = new window.YocoSDK({
-        publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
+      const res = await fetch('/api/yoco/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart: cart.map(({ id, title, price, quantity }) => ({
+            id,
+            title,
+            price,
+            quantity,
+          })),
+          customer,
+        }),
       });
 
-      yoco.showPopup({
-        amountInCents: Math.round(total * 100),
-        currency: 'ZAR',
-        name: 'Norfolk Deli',
-        description: 'Bakery & Deli Pre-Order',
-        callback: async (result) => {
-          if (result.error) {
-            alert(`Payment failed: ${result.error.message}`);
-            setLoading(false);
-          } else {
-            try {
-              const res = await fetch('/api/yoco', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  token: result.id,
-                  amountInCents: Math.round(total * 100),
-                  cart,
-                  customer,
-                }),
-              });
+      const data = await res.json();
 
-              const data = await res.json();
+      if (!res.ok || !data.redirectUrl) {
+        throw new Error(data.error || 'Could not start payment. Please try again.');
+      }
 
-              if (data.success) {
-                alert('Payment Successful! Your pre-order has been placed.');
-                if (clearCart) clearCart();
-                onClose();
-              } else {
-                alert(`Payment verification failed: ${data.error || 'Please contact support.'}`);
-              }
-            } catch (err) {
-              console.error('Yoco Checkout Error:', err);
-              alert('An error occurred processing your payment.');
-            } finally {
-              setLoading(false);
-            }
-          }
-        },
-      });
+      // Send the customer to Yoco's hosted payment page.
+      // The cart is cleared on /order-success, not here.
+      window.location.href = data.redirectUrl;
     } catch (err) {
-      console.error('Initialization error:', err);
+      console.error('Checkout error:', err);
+      alert(err.message || 'An error occurred starting your payment.');
       setLoading(false);
     }
   };
 
   return (
     <>
-      <div 
-        className={`cart-overlay ${isOpen ? 'active' : ''}`} 
+      <div
+        className={`cart-overlay ${isOpen ? 'active' : ''}`}
         onClick={onClose}
       ></div>
 
@@ -325,7 +268,7 @@ export default function CartDrawer({ isOpen, onClose }) {
 
             <div className="form-group">
               <label>Select Collection Date (48hr Notice Required) *</label>
-              
+
               {currentMonth ? (
                 <div className="cafe-calendar">
                   <div className="cafe-cal-header">
@@ -341,9 +284,9 @@ export default function CartDrawer({ isOpen, onClose }) {
                   <div className="cafe-cal-days">
                     {calendarGrid.map((dayData, idx) => {
                       const dateObj = dayData.date;
-                      const dateCompare = new Date(dateObj).setHours(0,0,0,0);
-                      const minCompare = new Date(minDate).setHours(0,0,0,0);
-                      const maxCompare = new Date(maxDate).setHours(0,0,0,0);
+                      const dateCompare = new Date(dateObj).setHours(0, 0, 0, 0);
+                      const minCompare = new Date(minDate).setHours(0, 0, 0, 0);
+                      const maxCompare = new Date(maxDate).setHours(0, 0, 0, 0);
 
                       const isDisabled = dateCompare < minCompare || dateCompare > maxCompare;
                       const isSelected = selectedDate && selectedDate.toDateString() === dateObj.toDateString();
@@ -393,7 +336,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                 id="checkout-btn"
                 disabled={loading || cart.length === 0}
               >
-                {loading ? 'Processing Payment...' : 'Pay via Yoco'}
+                {loading ? 'Redirecting to Yoco...' : 'Pay via Yoco'}
               </button>
             </div>
           </form>
