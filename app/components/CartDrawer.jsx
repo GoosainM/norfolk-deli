@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Script from 'next/script';
 import { useCart } from '../context/CartContext';
 
 export default function CartDrawer({ isOpen, onClose }) {
@@ -12,6 +13,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     collectionSlot: '',
   });
   const [loading, setLoading] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
 
   const [minDate, setMinDate] = useState(null);
   const [maxDate, setMaxDate] = useState(null);
@@ -30,6 +32,13 @@ export default function CartDrawer({ isOpen, onClose }) {
     setMinDate(min);
     setMaxDate(max);
     setCurrentMonth(new Date(min.getFullYear(), min.getMonth(), 1));
+  }, []);
+
+  // Check if window.Yoco is already available on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.Yoco) {
+      setSdkReady(true);
+    }
   }, []);
 
   const handlePrevMonth = () => {
@@ -115,37 +124,6 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Client-safe dynamic loader for Yoco SDK
-  const loadYocoScript = () => {
-    return new Promise((resolve, reject) => {
-      if (typeof window !== 'undefined' && window.YocoSDK) {
-        return resolve(window.YocoSDK);
-      }
-
-      const existingScript = document.getElementById('yoco-sdk-script');
-      if (existingScript) {
-        if (window.YocoSDK) return resolve(window.YocoSDK);
-        existingScript.addEventListener('load', () => resolve(window.YocoSDK));
-        existingScript.addEventListener('error', () => reject(new Error('Yoco SDK failed to load')));
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.id = 'yoco-sdk-script';
-      script.src = 'https://js.yoco.com/sdk/v1/yoco-sdk-web.js';
-      script.async = true;
-      script.onload = () => {
-        if (window.YocoSDK) {
-          resolve(window.YocoSDK);
-        } else {
-          reject(new Error('YocoSDK object not found on window'));
-        }
-      };
-      script.onerror = (err) => reject(err);
-      document.body.appendChild(script);
-    });
-  };
-
   // Yoco Popup Checkout Handler
   const handleCheckout = async (e) => {
     e.preventDefault();
@@ -160,12 +138,16 @@ export default function CartDrawer({ isOpen, onClose }) {
       return;
     }
 
+    if (typeof window === 'undefined' || !window.Yoco) {
+      alert('Yoco payment SDK is still loading or failed to load. Please refresh and try again.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const YocoSDKClass = await loadYocoScript();
-
-      const sdk = new YocoSDKClass({
+      // Yoco SDK attaches directly as window.Yoco
+      const sdk = new window.Yoco({
         publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
       });
 
@@ -211,14 +193,22 @@ export default function CartDrawer({ isOpen, onClose }) {
         },
       });
     } catch (err) {
-      console.error('Failed to load Yoco SDK:', err);
-      alert('Yoco payment SDK failed to load. Please refresh the page and try again.');
+      console.error('Failed to initialize Yoco SDK:', err);
+      alert('Yoco payment SDK failed to initialize. Please refresh the page and try again.');
       setLoading(false);
     }
   };
-  
+
   return (
     <>
+      {/* Next.js Script tag loads Yoco SDK safely before interaction */}
+      <Script
+        src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"
+        strategy="beforeInteractive"
+        onLoad={() => setSdkReady(true)}
+        onError={() => console.error('Yoco SDK script failed to load.')}
+      />
+
       <div 
         className={`cart-overlay ${isOpen ? 'active' : ''}`} 
         onClick={onClose}
