@@ -1,5 +1,4 @@
-import React, { Suspense } from 'react';
-import Script from 'next/script';
+import React from 'react';
 import './globals.css';
 import ClientProviders from './components/ClientProviders';
 
@@ -119,14 +118,10 @@ export default function RootLayout({
           rel="stylesheet" 
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
         />
+        {/* Load Yoco SDK cleanly via standard HTML script tag to prevent URL string bloat */}
+        <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" async />
       </head>
       <body>
-        {/* Yoco Inline SDK Script loaded synchronously before interaction */}
-        <Script 
-          src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js" 
-          strategy="beforeInteractive" 
-        />
-        
         <ClientProviders footer={<Footer />}>
           {children}
         </ClientProviders>
