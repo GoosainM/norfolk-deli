@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Script from 'next/script';
 import { useCart } from '../context/CartContext';
 
 export default function CartDrawer({ isOpen, onClose }) {
@@ -20,6 +19,35 @@ export default function CartDrawer({ isOpen, onClose }) {
   const [currentMonth, setCurrentMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
+  // Dynamically load Yoco SDK v1 cleanly on client mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (window.YocoSDK) {
+      setSdkReady(true);
+      return;
+    }
+
+    const scriptId = 'yoco-sdk-v1';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://js.yoco.com/sdk/v1/yoco-sdk-web.js';
+      script.async = true;
+
+      script.onload = () => {
+        console.log('Yoco SDK v1 loaded successfully');
+        setSdkReady(true);
+      };
+
+      script.onerror = (e) => {
+        console.error('Yoco SDK script failed to load:', e);
+      };
+
+      document.head.appendChild(script);
+    }
+  }, []);
+
   useEffect(() => {
     const today = new Date();
     
@@ -32,13 +60,6 @@ export default function CartDrawer({ isOpen, onClose }) {
     setMinDate(min);
     setMaxDate(max);
     setCurrentMonth(new Date(min.getFullYear(), min.getMonth(), 1));
-  }, []);
-
-  // Check if window.Yoco is already available on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.Yoco) {
-      setSdkReady(true);
-    }
   }, []);
 
   const handlePrevMonth = () => {
@@ -126,87 +147,80 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   // Yoco Popup Checkout Handler
   const handleCheckout = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (cart.length === 0) {
-    alert('Your basket is currently empty!');
-    return;
-  }
+    if (cart.length === 0) {
+      alert('Your basket is currently empty!');
+      return;
+    }
 
-  if (!customer.name || !customer.email || !customer.phone || !customer.collectionSlot) {
-    alert('Please fill in your contact details and select a collection date from the calendar.');
-    return;
-  }
+    if (!customer.name || !customer.email || !customer.phone || !customer.collectionSlot) {
+      alert('Please fill in your contact details and select a collection date from the calendar.');
+      return;
+    }
 
-  // Check for window.Yoco in v2
-  if (typeof window === 'undefined' || !window.Yoco) {
-    alert('Yoco payment SDK failed to load. Please refresh and try again.');
-    return;
-  }
+    // Correct check for window.YocoSDK
+    if (typeof window === 'undefined' || !window.YocoSDK) {
+      alert('Yoco payment SDK failed to load. Please refresh and try again.');
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const yoco = new window.Yoco({
-      publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
-    });
+    try {
+      // Correct constructor instantiation
+      const yoco = new window.YocoSDK({
+        publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || 'pk_test_ed3c54a6192143df8d322d8616a',
+      });
 
-    yoco.showPopup({
-      amountInCents: Math.round(total * 100),
-      currency: 'ZAR',
-      name: 'Norfolk Deli',
-      description: 'Bakery & Deli Pre-Order',
-      callback: async (result) => {
-        if (result.error) {
-          alert(`Payment failed: ${result.error.message}`);
-          setLoading(false);
-        } else {
-          try {
-            const res = await fetch('/api/yoco', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                token: result.id,
-                amountInCents: Math.round(total * 100),
-                cart,
-                customer,
-              }),
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-              alert('Payment Successful! Your pre-order has been placed.');
-              if (clearCart) clearCart();
-              onClose();
-            } else {
-              alert(`Payment verification failed: ${data.error || 'Please contact support.'}`);
-            }
-          } catch (err) {
-            console.error('Yoco Checkout Error:', err);
-            alert('An error occurred processing your payment.');
-          } finally {
+      yoco.showPopup({
+        amountInCents: Math.round(total * 100),
+        currency: 'ZAR',
+        name: 'Norfolk Deli',
+        description: 'Bakery & Deli Pre-Order',
+        callback: async (result) => {
+          if (result.error) {
+            alert(`Payment failed: ${result.error.message}`);
             setLoading(false);
+          } else {
+            try {
+              const res = await fetch('/api/yoco', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  token: result.id,
+                  amountInCents: Math.round(total * 100),
+                  cart,
+                  customer,
+                }),
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                alert('Payment Successful! Your pre-order has been placed.');
+                if (clearCart) clearCart();
+                onClose();
+              } else {
+                alert(`Payment verification failed: ${data.error || 'Please contact support.'}`);
+              }
+            } catch (err) {
+              console.error('Yoco Checkout Error:', err);
+              alert('An error occurred processing your payment.');
+            } finally {
+              setLoading(false);
+            }
           }
-        }
-      },
-    });
-  } catch (err) {
-    console.error('Initialization error:', err);
-    setLoading(false);
-  }
-};
+        },
+      });
+    } catch (err) {
+      console.error('Initialization error:', err);
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      {/* Next.js Script tag loads Yoco SDK safely before interaction */}
-      <Script
-        src="https://js.yoco.com/sdk/v2/yoco-sdk-web.js"
-        strategy="afterInteractive"
-        onLoad={() => console.log('Yoco SDK v2 loaded successfully')}
-  onError={(e) => console.error('Yoco SDK script failed to load:', e)}
-/>
-
       <div 
         className={`cart-overlay ${isOpen ? 'active' : ''}`} 
         onClick={onClose}
