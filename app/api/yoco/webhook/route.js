@@ -2,8 +2,6 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-
 // Escape anything a customer typed before putting it in the email HTML
 const esc = (s = '') =>
   String(s).replace(/[&<>"']/g, (c) => ({
