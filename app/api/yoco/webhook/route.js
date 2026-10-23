@@ -95,6 +95,27 @@ async function sendOrderEmail(event) {
     }`,
     html,
   });
+    // Confirmation email to the customer (failure here must not break the cafe email)
+  if (meta.customerEmail && !isTest) {
+    try {
+      await transporter.sendMail({
+        from: `"Norfolk Deli" <${process.env.SMTP_USER}>`,
+        to: meta.customerEmail,
+        subject: 'Your Norfolk Deli order is confirmed',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:560px">
+            <h2 style="color:#535622">Thank you, ${esc(meta.customerName || '')}!</h2>
+            <p>We've received your payment of <strong>R ${amount}</strong>.</p>
+            <p><strong>Items:</strong> ${esc(meta.items || '')}</p>
+            <p><strong>Collection:</strong> ${esc(meta.collectionSlot || '')}</p>
+            <p>If you need to change anything, just reply to this email.</p>
+            <p>Norfolk Deli</p>
+          </div>`,
+      });
+    } catch (err) {
+      console.error('Customer email failed:', err);
+    }
+  }
 }
 
 export async function POST(req) {
