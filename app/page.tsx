@@ -77,7 +77,7 @@ export default function HomePage() {
             <div className="dual-card-overlay"></div>
             <div className="dual-card-content">
               <h3>Bakery Orders</h3>
-              <p>Pre-order celebration cakes and gluten-free frittatas 48 hours in advance.</p>
+              <p></p>
               <Link href="/bakery" className="btn-primary">
                 Explore Bakery &rarr;
               </Link>
@@ -89,7 +89,7 @@ export default function HomePage() {
             <div className="dual-card-overlay"></div>
             <div className="dual-card-content">
               <h3>Cafe Menu</h3>
-              <p>Browse our walk-in counter options for coffee, rarebits, and fresh baked goods.</p>
+              <p></p>
               <Link href="/menu" className="btn-primary">
                 View Menu &rarr;
               </Link>
