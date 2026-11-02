@@ -16,7 +16,7 @@ export default function Navbar({ onOpenCart }) {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <header className="site-header">
+    <header className="site-header sticky-header">
       <div className="header-container">
         {/* Toggle Button */}
         <button 
@@ -54,6 +54,14 @@ export default function Navbar({ onOpenCart }) {
           </ul>
         </nav>
 
+        {/* Centered Brand Title */}
+        <div className="header-brand">
+          <Link href="/" onClick={closeMenu} className="brand-logo">
+            Norfolk Deli.
+          </Link>
+        </div>
+
+        {/* Basket Wrapper */}
         <div className="header-basket-wrapper">
           <button id="open-cart" className="basket-btn" onClick={onOpenCart}>
             <span>Basket</span>
