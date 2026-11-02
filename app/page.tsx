@@ -55,7 +55,10 @@ export default function HomePage() {
       {/* Welcome Section */}
       <section className="section">
         <div className="section-header" style={{ maxWidth: '780px', margin: '0 auto 3rem auto' }}>
-          <h2>Welcome to Norfolk Deli</h2>
+          <h2 style={{ fontSize: 'clamp(1.25rem, 5vw, 2.25rem)', whiteSpace: 'nowrap' }}>
+            Welcome to Norfolk Deli
+            </h2>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
             <p> Norfolk deli is an independent café, deli and cakery in the heart of Sea Point, Cape Town.
             </p>
