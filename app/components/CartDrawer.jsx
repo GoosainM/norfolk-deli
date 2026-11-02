@@ -287,6 +287,10 @@ export default function CartDrawer({ isOpen, onClose }) {
                       const dateCompare = new Date(dateObj).setHours(0, 0, 0, 0);
                       const minCompare = new Date(minDate).setHours(0, 0, 0, 0);
                       const maxCompare = new Date(maxDate).setHours(0, 0, 0, 0);
+                      
+                      const isHoliday = 
+                      (dateObj.getFullYear() === 2026 && dateObj.getMonth() === 11 && (dateObj.getDate() === 25 || dateObj.getDate() === 26)) ||
+                      (dateObj.getFullYear() === 2027 && dateObj.getMonth() === 0 && (dateObj.getDate() === 1 || dateObj.getDate() === 2 || dateObj.getDate() === 3));
 
                       const isDisabled = dateCompare < minCompare || dateCompare > maxCompare;
                       const isSelected = selectedDate && selectedDate.toDateString() === dateObj.toDateString();
