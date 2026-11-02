@@ -1622,46 +1622,58 @@ h1, h2, h3, h4, h5, h6 {
   .nav-links a.active {
     color: #e2d8b2 !important;
   }
-
-  
 }
-/* Sticky Header Position */
-.sticky-header {
-  position: sticky;
+
+/* Sticky Header Setup */
+.site-header.sticky-header {
+  position: fixed;
   top: 0;
-  z-index: 1000;
-  background-color: #ffffff; /* Adjust background color to match your design theme */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999;
+  background-color: #ffffff; /* Or your preferred header background */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Header Container Layout */
+/* Ensure Body Content Isn't Hidden Behind Fixed Header */
+body {
+  padding-top: 70px; /* Match your header height */
+}
+
+/* Header Container Layout Grid */
 .header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 0.75rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  position: relative;
+  width: 100%;
 }
 
-/* Brand Title Styling */
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
 .header-brand {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex: 1;
   text-align: center;
+}
+
+.header-basket-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .brand-logo {
   font-family: 'Tan Meringue', 'Glacial Indifference', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2c3e50; /* Match your brand accent color */
+  color: #2c3e50;
   text-decoration: none;
   white-space: nowrap;
-}
-
-.brand-logo:hover {
-  opacity: 0.9;
 }

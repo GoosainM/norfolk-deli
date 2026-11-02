@@ -18,50 +18,51 @@ export default function Navbar({ onOpenCart }) {
   return (
     <header className="site-header sticky-header">
       <div className="header-container">
-        {/* Toggle Button */}
-        <button 
-          id="mobile-menu-toggle" 
-          className="mobile-toggle-btn" 
-          onClick={toggleMenu}
-          aria-label="Toggle navigation menu"
-        >
-          <i className={isMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"}></i>
-        </button>
+        {/* Left Section: Mobile Toggle + Nav Links */}
+        <div className="header-left">
+          <button 
+            id="mobile-menu-toggle" 
+            className="mobile-toggle-btn" 
+            onClick={toggleMenu}
+            aria-label="Toggle navigation menu"
+          >
+            <i className={isMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"}></i>
+          </button>
 
-        {/* Mobile-enabled Navigation Menu */}
-        <nav id="site-nav" className={`nav-wrapper ${isMenuOpen ? 'active' : ''}`}>
-          <ul className="nav-links">
-            <li>
-              <Link href="/" className={pathname === '/' ? 'active' : ''} onClick={closeMenu}>
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/bakery" className={pathname === '/bakery' ? 'active' : ''} onClick={closeMenu}>
-                Bakery
-              </Link>
-            </li>
-            <li>
-              <Link href="/menu" className={pathname === '/menu' ? 'active' : ''} onClick={closeMenu}>
-                Menu
-              </Link>
-            </li>
-            <li>
-              <Link href="/events" className={pathname === '/events' ? 'active' : ''} onClick={closeMenu}>
-                Events
-              </Link>
-            </li>
-          </ul>
-        </nav>
+          <nav id="site-nav" className={`nav-wrapper ${isMenuOpen ? 'active' : ''}`}>
+            <ul className="nav-links">
+              <li>
+                <Link href="/" className={pathname === '/' ? 'active' : ''} onClick={closeMenu}>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/bakery" className={pathname === '/bakery' ? 'active' : ''} onClick={closeMenu}>
+                  Bakery
+                </Link>
+              </li>
+              <li>
+                <Link href="/menu" className={pathname === '/menu' ? 'active' : ''} onClick={closeMenu}>
+                  Menu
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className={pathname === '/events' ? 'active' : ''} onClick={closeMenu}>
+                  Events
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
-        {/* Centered Brand Title */}
+        {/* Center Section: Centered Brand Title */}
         <div className="header-brand">
           <Link href="/" onClick={closeMenu} className="brand-logo">
             Norfolk Deli.
           </Link>
         </div>
 
-        {/* Basket Wrapper */}
+        {/* Right Section: Basket Button */}
         <div className="header-basket-wrapper">
           <button id="open-cart" className="basket-btn" onClick={onOpenCart}>
             <span>Basket</span>
