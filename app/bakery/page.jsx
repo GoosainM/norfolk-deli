@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { client, urlFor } from '../lib/sanity';
 
 export default function BakeryPage() {
-  const [activeTab, setActiveTab] = useState('savouries');
+  const [activeTab, setActiveTab] = useState('cakes');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
@@ -62,14 +62,6 @@ export default function BakeryPage() {
 
   return (
     <>
-      {/* Scattered Background Decorative Images */}
-      <div className="bg-decorations" aria-hidden="true">
-        <img src="/images/birthday-cake.png" className="bg-decor bg-top-left" alt="" />
-        <img src="/images/coffee-cup.png" className="bg-decor bg-top-right" alt="" />
-        <img src="/images/table-spread.png" className="bg-decor bg-center-left" alt="" />
-        <img src="/images/counter-scene.jpg" className="bg-decor bg-center" alt="" />
-        <img src="/images/logo-black.png" className="bg-decor bg-bottom-left" alt="" />
-      </div>
 
       <main className="section">
         {/* Page Title Header */}
