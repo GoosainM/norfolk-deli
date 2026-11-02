@@ -57,15 +57,13 @@ export default function HomePage() {
         <div className="section-header" style={{ maxWidth: '780px', margin: '0 auto 3rem auto' }}>
           <h2>Welcome to Norfolk Deli</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+            <p> Norfolk deli is an independent café, deli and cakery in the heart of Sea Point, Cape Town.
+            </p>
             <p>
-  Norfolk deli is an independent café, deli and cakery in the heart of Sea Point, Cape Town.
-</p>
-<p>
-  Freshly baked cakes, great coffee and food made with quality ingredients. Our shelves are stocked with a mix of our own creations, baked goods from local makers and pantry favourites we&apos;ve carefully selected.
-</p>
-<p>
-  A relaxed neighbourhood space built around making everyone feel welcome.
-</p>
+              Freshly baked cakes, great coffee and food made with quality ingredients. Our shelves are stocked with a mix of our own creations, baked goods from local makers and pantry favourites we&apos;ve carefully selected.
+              </p>
+              <p>
+                A relaxed neighbourhood space built around making everyone feel welcome.
             </p>
           </div>
         </div>
