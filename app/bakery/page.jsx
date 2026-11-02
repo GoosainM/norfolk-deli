@@ -82,17 +82,17 @@ export default function BakeryPage() {
         <div className="category-tabs">
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'savouries' ? 'active' : ''}`}
-            onClick={() => setActiveTab('savouries')}
-          >
-            Savouries
-          </button>
-          <button
-            type="button"
             className={`tab-btn ${activeTab === 'cakes' ? 'active' : ''}`}
             onClick={() => setActiveTab('cakes')}
           >
             Cakes & Bakes
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${activeTab === 'savouries' ? 'active' : ''}`}
+            onClick={() => setActiveTab('savouries')}
+          >
+            Savouries
           </button>
         </div>
 
